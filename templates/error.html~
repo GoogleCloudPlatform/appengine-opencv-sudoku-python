@@ -1,7 +1,0 @@
-{% extends "templates/base.html" %}
-{% block content %}
-<p id="error">
-  Uh-oh! There was an error solving the puzzle: {{ error }}.
-  Please try a different puzzle.
-</p>
-{% endblock %}
