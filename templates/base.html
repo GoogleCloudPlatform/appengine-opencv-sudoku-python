@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      OpenCV Example
+    </title>
+    <style type="text/css">
+      body {
+        width:500px;
+        margin:0px auto;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      #error {
+        color: #800;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>
+      OpenCV Example
+    </h1>
+    {% block content %}{% endblock %}
+    <form action="/solve" enctype="multipart/form-data" method="post">
+      <input type="file" name="sudoku"><br>
+      <input type="submit" value="Solve">
+    </form>
+  </body>
+</html>
