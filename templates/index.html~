@@ -1,6 +1,0 @@
-{% extends "templates/base.html" %}
-{% block content %}
-<p>
-  Upload an image of a Sudoku puzzle.
-</p>
-{% endblock %}
