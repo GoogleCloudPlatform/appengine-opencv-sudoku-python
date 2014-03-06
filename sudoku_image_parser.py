@@ -133,8 +133,8 @@ class SudokuImageParser(object):
             Trained cv2.KNearest model.
         """
 
-        samples = np.float32(np.loadtxt('feature_vector_pixels.data'))
-        responses = np.float32(np.loadtxt('samples_pixels.data'))
+        samples = np.float32(np.loadtxt('feature_vector_pixels2.data'))
+        responses = np.float32(np.loadtxt('samples_pixels2.data'))
 
         model = cv2.KNearest()
         model.train(samples, responses)
@@ -208,9 +208,12 @@ class SudokuImageParser(object):
         for contour in contours:
             area = cv2.contourArea(contour)
 
-            if 100 < area < 800:
+            # if 100 < area < 800:
+            if 50 < area < 800:
                 (bx, by, bw, bh) = cv2.boundingRect(contour)
-                if (100 < bw*bh < 1200) and (10 < bw < 40) and (25 < bh < 45):
+                # if (100 < bw*bh < 1200) and (10 < bw < 40) and (25 < bh < 45):
+                # aju
+                if (100 < bw*bh < 1200) and (5 < bw < 40) and (10 < bh < 45):
                     # Get the region of interest, which contains the number.
                     roi = dilate[by:by + bh, bx:bx + bw]
                     small_roi = cv2.resize(roi, (10, 10))
@@ -251,7 +254,9 @@ class SudokuImageParser(object):
         except cv2.error as e:
             raise ImageError('Could not process image.')
 
-        mod_image = cv2.GaussianBlur(gray_image, ksize=(3, 3), sigma1=sigma1)
+        # mod_image = cv2.GaussianBlur(gray_image, ksize=(3, 3), sigma1=sigma1)
+        # aju
+        mod_image = cv2.GaussianBlur(gray_image, (3, 3), sigma1)
         if dilate:
             mod_image = cv2.dilate(
                     mod_image,

@@ -53,6 +53,7 @@ class Solve(webapp2.RequestHandler):
             stringified_puzzle = ''
             try:
                 stringified_puzzle = parser.parse(image_data)
+                logging.info("stringified puzzle: %s", stringified_puzzle)
             except sudoku_image_parser.ImageError as e:
                 self._return_error(self, str(e))
                 return
@@ -86,7 +87,7 @@ class Solve(webapp2.RequestHandler):
 
         template = JINJA_ENVIRONMENT.get_template('templates/error.html')
         handler.response.out.write(template.render({'error': e}))
-    
+
 
 APP = webapp2.WSGIApplication([
     ('/', MainHandler),
