@@ -16,6 +16,7 @@
 
 __author__ = 'kbrisbin@google.com (Kathryn Hurley)'
 
+import base64
 import logging
 import os
 
@@ -30,6 +31,13 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'])
 
+def decode_if_needed(data):
+    if data.startswith('data') and 'base64' in data:
+        # remove data URL prefixes
+        data = data.split('base64,', 1)[1]
+        data = base64.standard_b64decode(data)
+    return data
+
 
 class MainHandler(webapp2.RequestHandler):
     """Handles requests to the main page."""
@@ -42,12 +50,16 @@ class MainHandler(webapp2.RequestHandler):
 
 
 class Solve(webapp2.RequestHandler):
-    """Handles the post request with the sudoku image."""
+    """Handles the post request with the sudoku image.
+    
+    Accepts either data URL strings or binary (as from <input type="file">).
+    """
 
     def post(self):
         """Display the solved sudoku puzzle."""
 
         image_data = self.request.get('sudoku')
+        image_data = decode_if_needed(image_data)
         if image_data:
             parser = sudoku_image_parser.SudokuImageParser()
             stringified_puzzle = ''
