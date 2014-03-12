@@ -1,11 +1,20 @@
 {% extends "templates/base.html" %}
 {% block content %}
     <p>
-    <form action="http://briandorsey-zerozone.appspot.com/solve" enctype="multipart/form-data" method="post">
+    Take a screenshot of a Sudoku puzzle: <br/>
+    <form action="/solve" enctype="multipart/form-data" method="post">
       <input type="hidden" name="sudoku" id="sudoku"><br>
       <button type="button" id="screenshot-button">Take!</button>
       <input type="submit" value="Solve" id="solve">
     </form>
+    </p>
+
+    <p>
+      Or, upload a puzzle image: <br/>
+      <form action="/solve_upld" enctype="multipart/form-data" method="post">
+        <input type="file" name="sudoku"><br>
+        <input type="submit" value="Solve">
+       </form>
     </p>
 
     <video id="screenshot-stream" width="640" height="480" autoplay></video>
