@@ -14,12 +14,15 @@
 
 """Solves a Sudoku puzzle.
 
-Code modified from the following source:
-- http://goo.gl/U4hMDV
+Code modified from the following sources:
+- http://goo.gl/U4hMDV, using http://norvig.com/sudoku.py
 """
 
 __author__ = 'kbrisbin@google.com (Kathryn Hurley)'
 
+import logging
+
+import norvig_sudoku
 
 class SudokuSolver(object):
     """Solves a Sudoku puzzle.
@@ -56,7 +59,7 @@ class SudokuSolver(object):
                 (s, set(sum(self.units[s], []))-set([s])) for s in self.squares)
 
     def solve(self, grid):
-        """Solve the sudoku puzzle.
+        """Solve the sudoku puzzle, using Peter Norvig's solver script (http://norvig.com/sudoku.py)
 
         Args:
             grid: String Sudoku puzzle with all numbers in a row and blanks
@@ -69,12 +72,21 @@ class SudokuSolver(object):
             ContradictionError: if puzzle cannot be solved.
         """
 
-        answer = self._search(self._parse_grid(grid))
-        if answer:
-            keys = answer.keys()
+        values = norvig_sudoku.solve(grid)
+        if values and norvig_sudoku.solved(values):
+            logging.info("norvig solver returned: %s", values)
+            keys = values.keys()
             keys.sort()
-            string_answer = ''.join(answer[i] for i in keys)
-            return string_answer
+            nstring_answer = ''.join(values[i] for i in keys)
+            logging.info("norvig solver final string: %s", nstring_answer)
+            return nstring_answer
+
+        # answer = self._search(self._parse_grid(grid))
+        # if answer:
+        #     keys = answer.keys()
+        #     keys.sort()
+        #     string_answer = ''.join(answer[i] for i in keys)
+        #     return string_answer
 
         raise ContradictionError('Puzzle cannot be solved.')
 
@@ -91,146 +103,6 @@ class SudokuSolver(object):
 
         return [x + y for x in a for y in b]
 
-    def _parse_grid(self, grid):
-        """Convert grid to a dict of possible values, {square: digits}.
-
-        Args:
-            grid: String Sudoku puzzle with all numbers in a row and blanks
-                set to zero.
-
-        Returns:
-            Dictionary of possible values.
-
-        Raises:
-            ContradictionError: if puzzle cannot be solved.
-        """
-
-        # To start, every square can be any digit; assign values from the grid.
-        values = dict((s, self.digits) for s in self.squares)
-        for s, d in self._grid_values(grid).items():
-            if d in self.digits and not self._assign(values, s, d):
-                raise ContradictionError('Puzzle cannot be solved.')
-
-        return values
-
-    def _grid_values(self, grid):
-        """Convert grid to dict of {square: char} with '0' or '.' for empties.
-
-        Args:
-            grid: String Sudoku puzzle with all numbers in a row and blanks
-                set to zero.
-
-        Returns:
-            Dictionary of {square: char}.
-        """
-
-        chars = [c for c in grid if c in self.digits or c in '0.']
-        assert len(chars) == 81
-        return dict(zip(self.squares, chars))
-
-    def _assign(self, values, s, d):
-        """Eliminate all other values (except d) from values[s] and propagate.
-
-        Args:
-            values: List of string values.
-            s: Index from list values.
-            d: String to keep.
-
-        Returns:
-            The list of values.
-
-        Raises:
-            ContradictionError: if the puzzle cannot be solved.
-        """
-
-        other_values = values[s].replace(d, '')
-
-        if all(self._eliminate(values, s, d2) for d2 in other_values):
-            return values
-
-        raise ContradictionError('Puzzle cannot be solved.')
-
-    def _search(self, values):
-        """Using depth-first search and propagation, try all possible values.
-
-        Args:
-            values: List of strings.
-
-        Returns:
-            List of string values.
-
-        Raises:
-            ValueError: if values is False.
-        """
-
-        if values is False:
-            raise ValueError('values cannot be False')
-
-        if all(len(values[s]) == 1 for s in self.squares):
-            return values
-
-        # Chose the unfilled square s with the fewest possibilities
-        n, s = min((len(values[s]), s) for s in self.squares if len(
-                values[s]) > 1)
-        return self._some(self._search(self._assign(
-                values.copy(), s, d)) for d in values[s])
-
-    def _eliminate(self, values, s, d):
-        """Eliminate d from values[s]; propagate when values or places <= 2.
-
-        Args:
-            values: List of strings.
-            s: Index from list of values.
-            d: String value to eliminate.
-
-        Returns:
-            String list of values.
-
-        Raises:
-            ContradictionError: if puzzle cannot be solved.
-        """
-
-        if d not in values[s]:
-            return values
-
-        values[s] = values[s].replace(d, '')
-
-        # If a square s is reduced to one value d2, eliminate d2 from the peers.
-        if not values[s]:
-            raise ContradictionError('Puzzle cannot be solved.')
-
-        elif len(values[s]) == 1:
-            d2 = values[s]
-            if not all(self._eliminate(values, s2, d2) for s2 in self.peers[s]):
-                raise ContradictionError('Puzzle cannot be solved.')
-
-        # If a unit u is reduced to only one place for a value d, put it there.
-        for u in self.units[s]:
-            dplaces = [s for s in u if d in values[s]]
-            if not dplaces:
-                raise ContradictionError('Puzzle cannot be solved.')
-
-            elif len(dplaces) == 1:
-                # d can only be in one place in unit; assign it there
-                if not self._assign(values, dplaces[0], d):
-                    raise ContradictionError('Puzzle cannot be solved.')
-
-        return values
-
-    def _some(self, seq):
-        """Return some element of seq that is true.
-
-        Args:
-            seq: An iterable object.
-
-        Returns:
-            Any item in the iterable object that is true or False if not found.
-        """
-
-        for e in seq:
-            if e: return e
-
-        return False
 
 
 class ContradictionError(Exception):

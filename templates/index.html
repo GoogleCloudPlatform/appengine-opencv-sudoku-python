@@ -1,9 +1,14 @@
 {% extends "templates/base.html" %}
 {% block content %}
+
+  <div class='select'>
+    <label for='videoSource'>Video source: </label><select id='videoSource'></select>
+  </div>
+
     <p>
     Take a screenshot of a Sudoku puzzle: <br/>
     <form action="/solve" enctype="multipart/form-data" method="post">
-      <input type="hidden" name="sudoku" id="sudoku"><br>
+      <input type="hidden" name="sudoku" id="sudoku">
       <button type="button" id="screenshot-button">Take!</button>
       <input type="submit" value="Solve" id="solve">
     </form>
@@ -12,7 +17,7 @@
     <p>
       Or, upload a puzzle image: <br/>
       <form action="/solve_upld" enctype="multipart/form-data" method="post">
-        <input type="file" name="sudoku"><br>
+        <input type="file" name="sudoku">
         <input type="submit" value="Solve">
        </form>
     </p>
@@ -23,6 +28,7 @@
 
 <script>
 function errorCallback(e) {
+  console.log(e);
   if (e.code == 1) {
     alert('User denied access to their camera');
   } else {
@@ -31,7 +37,7 @@ function errorCallback(e) {
 }
 
 var sudoku = document.querySelector('#sudoku');
-var video = document.querySelector('#screenshot-stream');
+var videoElement = document.querySelector('#screenshot-stream');
 var button = document.querySelector('#screenshot-start-stop');
 var screenshot_button = document.querySelector('#screenshot-button');
 var canvas = document.querySelector('#screenshot-canvas');
@@ -39,25 +45,26 @@ var img = document.querySelector('#screenshot');
 var ctx = canvas.getContext('2d');
 var localMediaStream = null;
 
+var videoSelect = document.querySelector("select#videoSource");
 
 function sizeCanvas() {
   // video.onloadedmetadata not firing in Chrome so we have to hack.
   // See crbug.com/110938.
   setTimeout(function() {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    img.height = video.videoHeight;
-    img.width = video.videoWidth;
+    canvas.width = videoElement.videoWidth;
+    canvas.height = videoElement.videoHeight;
+    img.height = videoElement.videoHeight;
+    img.width = videoElement.videoWidth;
   }, 100);
 }
 
 
 function snapshot() {
-  ctx.drawImage(video, 0, 0);
+  console.log("in snapshot");
+  ctx.drawImage(videoElement, 0, 0);
   img.src = canvas.toDataURL('image/png');
   sudoku.value = canvas.toDataURL('image/png');
 }
-
 
 screenshot_button.addEventListener('click', function(e) {
   if (localMediaStream) {
@@ -66,25 +73,63 @@ screenshot_button.addEventListener('click', function(e) {
   }
 }, false);
 
+navigator.getUserMedia = navigator.getUserMedia ||
+  navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-if (navigator.getUserMedia) {
-  navigator.getUserMedia('video', function(stream) {
-    video.src = stream;
-    localMediaStream = stream;
-    sizeCanvas();
-  }, errorCallback);
-} else if (navigator.webkitGetUserMedia) {
-  navigator.webkitGetUserMedia({video: true}, function(stream) {
-    video.src = window.URL.createObjectURL(stream);
-    localMediaStream = stream;
-    sizeCanvas();
-  }, errorCallback);
-} else {
-  errorCallback({target: video});
+function gotSources(sourceInfos) {
+  for (var i = 0; i != sourceInfos.length; ++i) {
+    var sourceInfo = sourceInfos[i];
+    var option = document.createElement("option");
+    option.value = sourceInfo.id;
+    if (sourceInfo.kind === 'audio') {
+      // option.text = sourceInfo.label || 'microphone ' + (audioSelect.length + 1);
+      // audioSelect.appendChild(option);
+    } else if (sourceInfo.kind === 'video') {
+      option.text = sourceInfo.label || 'camera ' + (videoSelect.length + 1);
+      videoSelect.appendChild(option);
+    } else {
+      console.log('Some other kind of source: ', sourceInfo);
+    }
+  }
 }
 
-video.addEventListener('click', snapshot, false);
-// TODO: add a corresponding handler for the snapshot to post the form and solve the puzzle
+if (typeof MediaStreamTrack === 'undefined'){
+  alert('This browser does not support MediaStreamTrack.\n\nTry Chrome Canary.');
+} else {
+  MediaStreamTrack.getSources(gotSources);
+}
+
+
+function successCallback(stream) {
+  window.stream = stream; // make stream available to console
+  videoElement.src = window.URL.createObjectURL(stream);
+  localMediaStream = stream;
+  sizeCanvas();
+  videoElement.play();
+}
+
+function errorCallback(error){
+  console.log("navigator.getUserMedia error: ", error);
+}
+
+function start(){
+  if (!!window.stream) {
+    videoElement.src = null;
+    window.stream.stop();
+  }
+  var videoSource = videoSelect.value;
+  var constraints = {
+    video: {
+      optional: [{sourceId: videoSource}]
+    }
+  };
+  navigator.getUserMedia(constraints, successCallback, errorCallback);
+}
+
+videoSelect.onchange = start;
+
+start();
 
 </script>
+
 {% endblock %}
