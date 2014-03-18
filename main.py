@@ -25,6 +25,7 @@ import webapp2
 
 import sudoku_image_parser
 import sudoku_solver
+import utils
 
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -48,7 +49,21 @@ class MainHandler(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('templates/index.html')
         self.response.out.write(template.render({}))
 
+class ShowGallery(webapp2.RequestHandler):
+    """Handles requests to show a gallery of solved puzzles."""
+
+    def get(self):
+        """Display the gallery page."""
+
+        template = JINJA_ENVIRONMENT.get_template('templates/gallery.html')
+        self.response.out.write(template.render({}))
+
 class SolverBase(webapp2.RequestHandler):
+
+    # TODO: does the cloudstorage module api include generation of the public URL?
+    # Couldn't spot it.
+    api_url = 'https://storage.googleapis.com'
+
 
     def _solved_puzzle_image(self, stringified_puzzle):
         solver = sudoku_solver.SudokuSolver()
@@ -93,8 +108,11 @@ class Solve(SolverBase):
                 return
             try:
                 image_solution = self._solved_puzzle_image(stringified_puzzle)
-                self.response.headers['Content-Type'] = 'image/jpeg'
-                self.response.write(image_solution.tostring())
+                gcs_file = utils.create_jpg_file(image_solution.tostring())
+                image_url = self.api_url + gcs_file
+                logging.debug("url: %s", image_url)
+                template = JINJA_ENVIRONMENT.get_template('templates/result.html')
+                self.response.out.write(template.render({'image_url': image_url}))
                 return
             except (sudoku_solver.ContradictionError, ValueError) as e:
                 logging.debug(e)
@@ -108,6 +126,7 @@ class Solve(SolverBase):
 
 class SolveImageUpload(SolverBase):
     """Handles the post request with the sudoku image."""
+
 
     def post(self):
         """Display the solved sudoku puzzle."""
@@ -124,8 +143,11 @@ class SolveImageUpload(SolverBase):
                 return
             try:
                 image_solution = self._solved_puzzle_image(stringified_puzzle)
-                self.response.headers['Content-Type'] = 'image/jpeg'
-                self.response.write(image_solution.tostring())
+                gcs_file = utils.create_jpg_file(image_solution.tostring())
+                image_url = self.api_url + gcs_file
+                logging.debug("url: %s", image_url)
+                template = JINJA_ENVIRONMENT.get_template('templates/result.html')
+                self.response.out.write(template.render({'image_url': image_url}))
                 return
             except (sudoku_solver.ContradictionError, ValueError) as e:
                 logging.debug(e)
@@ -139,5 +161,6 @@ class SolveImageUpload(SolverBase):
 APP = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/solve', Solve),
-    ('/solve_upld', SolveImageUpload)
+    ('/solve_upld', SolveImageUpload),
+    ('/gallery', ShowGallery)
 ], debug=True)
