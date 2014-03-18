@@ -1,30 +1,73 @@
 {% extends "templates/base.html" %}
 {% block content %}
 
-  <div class='select'>
-    <label for='videoSource'>Video source: </label><select id='videoSource'></select>
+      <!-- Static navbar -->
+      <div class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Sudoku Solver</a>
+          </div>
+          <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#">Solve</a></li>
+              <li><a href="/gallery">Gallery</a></li>
+              <!-- <li><a href="#">Link</a></li> -->
+            </ul>
+<!--             <ul class="nav navbar-nav navbar-right">
+              <li class="active"><a href="./">Default</a></li>
+              <li><a href="../navbar-static-top/">Static top</a></li>
+              <li><a href="../navbar-fixed-top/">Fixed top</a></li>
+            </ul> -->
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </div>
+
+  <div class="content">
+    <h2>OpenCV Example</h2>
+      <div class='select'>
+        <label for='videoSource'>Video source:&nbsp;</label><select id='videoSource'></select>
+      </div>
+
+    <div class="abox">
+      <p>Take a screenshot of a Sudoku puzzle:</p>
+      <form role="form" action="/solve" enctype="multipart/form-data" method="post">
+        <input type="hidden" name="sudoku" id="sudoku">
+        <button type="button" class="btn btn-primary" id="screenshot-button">Take!</button>
+        <input type="submit" class="btn btn-primary" value="Solve" id="solve">
+      </form> <br/>
+      <div class="row">
+        <div class="col-md-6">
+          <video id="screenshot-stream" style="width:95%;" autoplay></video>
+        </div>
+        <div class="col-md-6">
+          <img id="screenshot" style="width:95%;" src="">
+          <canvas id="screenshot-canvas" style="width:95%;display:none;"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="abox">
+      <p>Or, upload a puzzle image:</p><br/>
+      <form role="form" action="/solve_upld" enctype="multipart/form-data" method="post">
+        <div class="form-group">
+          <label for="sudokufn">File input</label>
+          <input type="file" id ="sudokufn" name="sudoku">
+          <p class="help-block">Upload an image of a Sudoku puzzle.</p>
+        </div>
+        <input type="submit" class="btn btn-primary" value="Solve">
+       </form>
   </div>
 
-    <p>
-    Take a screenshot of a Sudoku puzzle: <br/>
-    <form action="/solve" enctype="multipart/form-data" method="post">
-      <input type="hidden" name="sudoku" id="sudoku">
-      <button type="button" id="screenshot-button">Take!</button>
-      <input type="submit" value="Solve" id="solve">
-    </form>
-    </p>
 
-    <p>
-      Or, upload a puzzle image: <br/>
-      <form action="/solve_upld" enctype="multipart/form-data" method="post">
-        <input type="file" name="sudoku">
-        <input type="submit" value="Solve">
-       </form>
-    </p>
 
-    <video id="screenshot-stream" width="640" height="480" autoplay></video>
-    <img id="screenshot" src="">
-    <canvas id="screenshot-canvas" style="display:none;"></canvas>
+
+</div> <!-- end content -->
 
 <script>
 function errorCallback(e) {
@@ -131,5 +174,4 @@ videoSelect.onchange = start;
 start();
 
 </script>
-
 {% endblock %}

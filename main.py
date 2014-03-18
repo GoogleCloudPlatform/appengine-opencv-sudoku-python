@@ -49,6 +49,15 @@ class MainHandler(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('templates/index.html')
         self.response.out.write(template.render({}))
 
+class ShowGallery(webapp2.RequestHandler):
+    """Handles requests to show a gallery of solved puzzles."""
+
+    def get(self):
+        """Display the gallery page."""
+
+        template = JINJA_ENVIRONMENT.get_template('templates/gallery.html')
+        self.response.out.write(template.render({}))
+
 class SolverBase(webapp2.RequestHandler):
 
     # TODO: does the cloudstorage module api include generation of the public URL?
@@ -152,5 +161,6 @@ class SolveImageUpload(SolverBase):
 APP = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/solve', Solve),
-    ('/solve_upld', SolveImageUpload)
+    ('/solve_upld', SolveImageUpload),
+    ('/gallery', ShowGallery)
 ], debug=True)
