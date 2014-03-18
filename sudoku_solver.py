@@ -81,13 +81,6 @@ class SudokuSolver(object):
             logging.info("norvig solver final string: %s", nstring_answer)
             return nstring_answer
 
-        # answer = self._search(self._parse_grid(grid))
-        # if answer:
-        #     keys = answer.keys()
-        #     keys.sort()
-        #     string_answer = ''.join(answer[i] for i in keys)
-        #     return string_answer
-
         raise ContradictionError('Puzzle cannot be solved.')
 
     def _cross(self, a, b):
