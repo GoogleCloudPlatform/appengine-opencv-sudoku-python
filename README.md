@@ -18,7 +18,9 @@ Code was used and modified from the following sources:
 
 First, edit the bucket name in `config.py` to the name of a Google Cloud Storage bucket for which your app has been given write permissions via its service account.  See [Using Service Accounts for Authentication](https://developers.google.com/storage/docs/authentication#service_accounts) for more information.
 
-This demo uses two [Modules](https://developers.google.com/appengine/docs/python/modules/), defined in `app.yaml` (the default module) and `backend.yaml` (the 'solver' module).  Change the app name in both those files to the name of your app.
+This demo uses two [Modules](https://developers.google.com/appengine/docs/python/modules/), defined in `app.yaml` (the default module) and `backend.yaml` (the 'solver' module).
+Change the app name in both those files to the name of your app.
+Do the same in `dispatch.yaml`.
 
 To deploy, do, the following.  First, update the modules as follows:
 
