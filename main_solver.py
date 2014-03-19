@@ -23,7 +23,7 @@ import jinja2
 import webapp2
 
 # from google.appengine.api import app_identity
-# from google.appengine.api import modules
+from google.appengine.api import modules
 from google.appengine.api import runtime
 # from google.appengine.api import users
 from google.appengine.ext import ndb
