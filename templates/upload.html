@@ -1,0 +1,70 @@
+{% extends "templates/base.html" %}
+{% block content %}
+
+  <!-- Static navbar -->
+  <div class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">Sudoku Solver</a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          <li ><a href="/">Capture and Solve</a></li>
+          <li class="active"><a href="#">Upload and Solve</a></li>
+          <!-- <li><a href="#">Link</a></li> -->
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div><!--/.container-fluid -->
+  </div>
+
+  <div class="content">
+    <h2>Upload A Sudoku Puzzle Image</h2>
+
+    <div class="abox">
+      <form role="form" id="form1" runat="server"
+        action="/solve_upld" enctype="multipart/form-data" method="post">
+        <div class="form-group">
+          <label for="sudokufn">File input</label>
+          <input type="file" id ="sudokufn" name="sudoku">
+          <p class="help-block">Upload an image of a Sudoku puzzle.</p>
+        </div>
+        <input type="hidden" name="sudoku_url" id="sudoku_url"
+          value="http://storage.googleapis.com/vm-sudoku/unsolved_puzzles/sudoku-book-02.png">
+        <input type="submit" class="btn btn-primary" value="Solve"><br/>
+        <img height="400" id="puzzle" src="http://storage.googleapis.com/vm-sudoku/unsolved_puzzles/sudoku-book-02.png"
+          alt="Sudoku image" />
+       </form>
+
+  </div>
+
+</div> <!-- end content -->
+
+<script>
+
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#puzzle').attr('src', e.target.result);
+                $('#puzzle').show();            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+
+
+    $("#sudokufn").change(function(){
+        readURL(this);
+    });
+</script>
+
+{% endblock %}

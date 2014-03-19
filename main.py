@@ -37,17 +37,17 @@ class MainHandler(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('templates/index.html')
         self.response.out.write(template.render({}))
 
-class ShowGallery(webapp2.RequestHandler):
-    """Handles requests to show a gallery of solved puzzles."""
+class UploadImage(webapp2.RequestHandler):
+    """Handles requests to show a puzzle upload page."""
 
     def get(self):
-        """Display the gallery page."""
+        """Display the puzzle upload page."""
 
-        template = JINJA_ENVIRONMENT.get_template('templates/gallery.html')
+        template = JINJA_ENVIRONMENT.get_template('templates/upload.html')
         self.response.out.write(template.render({}))
 
 
 APP = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/gallery', ShowGallery)
+    ('/upload', UploadImage)
 ], debug=True)

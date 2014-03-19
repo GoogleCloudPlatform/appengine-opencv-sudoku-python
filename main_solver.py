@@ -22,11 +22,10 @@ import os
 import jinja2
 import webapp2
 
-# from google.appengine.api import app_identity
 from google.appengine.api import modules
 from google.appengine.api import runtime
-# from google.appengine.api import users
 from google.appengine.ext import ndb
+from google.appengine.api import urlfetch
 
 import sudoku_image_parser
 import sudoku_solver
@@ -143,17 +142,20 @@ class SolveImageUpload(SolverBase):
     def post(self):
         """Display the solved sudoku puzzle."""
 
-        # aju testing instance mgmt -- will probably just remove this code
-        # numinst = modules.get_num_instances()
-        # logging.info("got %d instances", numinst)
-        # if numinst == 2:
-        #     logging.info("setting num instances from 2 to 3")
-        #     modules.set_num_instances(3)
-        # elif numinst == 3:
-        #     logging.info("setting num instances from 3 to 4")
-        #     modules.set_num_instances(4)
-
         image_data = self.request.get('sudoku')
+        if not image_data:
+            logging.info("did not get image data from form submit")
+            try:
+                image_url = self.request.get('sudoku_url')
+                if image_url:
+                    logging.info("image url: %s", image_url)
+                    result = urlfetch.fetch(image_url)
+                    if result.status_code == 200:
+                        image_data = result.content
+                else:
+                    logging.info('did not get image url...')
+            except:
+                logging.exception("issue fetching url data")
         if image_data:
             self.parser = sudoku_image_parser.SudokuImageParser()
             stringified_puzzle = ''
