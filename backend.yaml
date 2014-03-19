@@ -1,5 +1,5 @@
 application: vm-runtime-tester
-version: 1
+version: opencv
 module: solver
 runtime: python27
 vm: true
