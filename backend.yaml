@@ -1,20 +1,23 @@
 application: vm-runtime-tester
 version: opencv
+module: solver
 runtime: python27
+vm: true
 api_version: 1
 threadsafe: yes
 
 handlers:
-- url: /favicon\.ico
-  static_files: favicon.ico
-  upload: favicon\.ico
 
 - url: .*
-  script: main.APP
+  script: main_solver.APP
 
 libraries:
 - name: webapp2
   version: "2.5.2"
-- name: jinja2
-  version: latest
 
+manual_scaling:
+  instances: 2
+
+vm_settings:
+  machine_type: n1-standard-1
+  apt_get_install: python-opencv

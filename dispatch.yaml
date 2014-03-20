@@ -1,0 +1,10 @@
+application: vm-runtime-tester
+
+dispatch:
+# Default module serves the typical web resources and all static resources.
+- url: "*/favicon.ico"
+  module: default
+
+- url: "*/solve*"
+  module: solver
+
