@@ -1,11 +1,42 @@
-# VM Runtime OpenCV demo
+
+# Managed VMs OpenCV Sudoku Solver
 
 ## About
 
-This sample application demonstrates the use of [OpenCV][1] using App
-Engine's VM Runtime feature. The application allows a user to upload
-an image of a Sudoku puzzle. The app then solves the puzzle and displays
-the solution on the image.
+This sample application demonstrates the use of [OpenCV][1] run on App
+Engine Managed VMs, to implement a Sudoku solver. The app allows you to capture an image of a
+sudoku puzzle using your laptop's or phone's camera— or using a pre-existing image— and send it
+to the app to be solved.  The app then solves the puzzle, using OpenCV to do OCR, and displays the
+solution superimposed on the original image.
+OpenCV does not run on traditional App Engine instances due to their sandboxing restrictions.
+
+This demo uses two [Modules](https://developers.google.com/appengine/docs/python/modules/),
+defined in `app.yaml` (the default module) and `backend.yaml` (the 'solver' module).
+The default module uses "traditional" App Engine instances, and the `solver`
+module specifies Managed VMs.
+
+The app uses Task Queues to buffer solve requests.
+The frontend instances in the default module receive user requests to solve a puzzle.
+These requests are converted to tasks and added to a push queue,
+with the task handlers run on the Managed VM instances.
+
+This repo also contains a "minimal" version of a sudoku solver, which runs on
+traditional (non-Managed VM) App Engine instances and does not use OCR.  Instead, it
+takes as input a string of numbers that represents the puzzle's starting grid.
+This app is in the `minimal_api` directory.
+
+### OCR and Training Data
+
+This app creates an OCR model based on training data. (The data is in the files
+`samples_pixels2.data` and `feature_vector_pixels2.data`).
+The model needs to both identify where the numbers are in a grid, and correctly identify each
+number.
+The model is currently not general enough to
+work with the font & grid in every puzzle book.  In a follow-on version of this app, we'll include
+a training script that you can use to improve the model.
+
+We've included a couple of example puzzle image files that you can use to test the app.
+They're in the `test_puzzles` directory.
 
 Code was used and modified from the following sources:
 
@@ -14,21 +45,23 @@ Code was used and modified from the following sources:
 - [OpenCV's square detector sample][4]
 
 
-## Deployment
+## Configuration and Deployment
 
-First, edit the bucket name in `config.py` to the name of a Google Cloud Storage bucket for which your app has been given write permissions via its service account.  See [Using Service Accounts for Authentication](https://developers.google.com/storage/docs/authentication#service_accounts) for more information.
+First, edit the bucket name in `config.py` to the name of a Google Cloud Storage bucket for which
+your app has been given write permissions via its service account.  See
+[Using Service Accounts for Authentication](https://developers.google.com/storage/docs/authentication#service_accounts) for more information.
 
-This demo uses two [Modules](https://developers.google.com/appengine/docs/python/modules/), defined in `app.yaml` (the default module) and `backend.yaml` (the 'solver' module).
-Change the app name in both those files to the name of your app.
+Change the app name in both the `app.yaml` and `backend.yaml` files to the name of your app.
 Do the same in `dispatch.yaml`.
 
-To deploy, do, the following.  First, update the modules as follows:
+To deploy, do, the following.  First, update (deploy) the modules as follows:
 
     <path_to_sdk>/appcfg.py update -s preview.appengine.google.com app.yaml backend.yaml
 
 (You can also deploy them individually if you like).
 
-Then, update the app's module dispatch definitions as follows.  You only need to do this step more than once if you change the app's module routing information.
+Then, update the app's module dispatch definitions as follows.  You only need to do this step once,
+unless you change the app's module routing information.
 
     <path_to_sdk>/appcfg.py update_dispatch -s preview.appengine.google.com  <proj_dir>
 

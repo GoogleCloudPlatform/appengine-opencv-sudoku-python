@@ -30,40 +30,77 @@
 
     <div class="abox">
       <p>Take a screenshot of a Sudoku puzzle:</p>
-      <form role="form" action="/solve" enctype="multipart/form-data" method="post">
+      <form role="form" id="form1" action="/stage" enctype="multipart/form-data" method="post">
         <input type="hidden" name="sudoku" id="sudoku">
+        <input type="hidden" name="is_video" id="is_video" value="yes">
         <button type="button" class="btn btn-primary" id="screenshot-button">Take!</button>
         <input type="submit" class="btn btn-primary" value="Solve" id="solve">
+        <button type="button" disabled class="btn btn-primary" name="showvid-button"
+          id="showvid-button">Again!</button>
       </form> <br/>
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-5">
           <video id="screenshot-stream" style="width:95%;" autoplay></video>
+          <img style="display:none;width:95%;" id="puzzleres" src="" alt="solved Sudoku image" />
         </div>
-        <div class="col-md-6">
+        <div class="col-md-5">
           <img id="screenshot" style="width:95%;" src="">
           <canvas id="screenshot-canvas" style="width:95%;display:none;"></canvas>
+        </div>
+        </div>
+        <div class="row">
+        <div class="col-md-5">
+          <img style="display:none;width:95%;" id="puzzleres" src="" alt="solved Sudoku image" />
         </div>
       </div>
     </div>
 
-<!--     <div class="abox">
-      <p>Or, upload a puzzle image:</p><br/>
-      <form role="form" action="/solve_upld" enctype="multipart/form-data" method="post">
-        <div class="form-group">
-          <label for="sudokufn">File input</label>
-          <input type="file" id ="sudokufn" name="sudoku">
-          <p class="help-block">Upload an image of a Sudoku puzzle.</p>
-        </div>
-        <input type="submit" class="btn btn-primary" value="Solve">
-       </form>
-  </div> -->
-
-
-
-
 </div> <!-- end content -->
 
 <script>
+
+  $("#showvid-button").click(function(){
+    $('#puzzleres').hide();
+    $('#screenshot-stream').show();
+    $(this).prop("disabled",true);
+  });
+
+ $("#form1").submit(function(){
+    $('#screenshot-stream').hide();
+
+    var formData = new FormData($(this)[0]);
+    $.ajax({
+    url:$(this).attr("action"),
+    type: 'POST',
+    data: formData,
+    async: false,
+    success: function (data) {
+      console.log(data);
+      var solved_url = data.solved_url;
+      if (solved_url) {
+      // check for results to show up
+      setTimeout(function show_results() {
+        console.log("in setTimeout, checking " + solved_url);
+        var img = new Image();
+        img.onload = function() {
+          $('#puzzleres').attr('src', solved_url);
+          $('#puzzleres').show();
+          $("#showvid-button").prop("disabled",false);
+        };
+        img.onerror = function() {
+          setTimeout(show_results, 200);
+        }
+        img.src = solved_url;
+        }, 200);
+       }
+    },
+    cache: false,
+    contentType: false,
+    processData: false
+    });
+    return false;
+});
+
 function errorCallback(e) {
   console.log(e);
   if (e.code == 1) {
@@ -90,8 +127,8 @@ function sizeCanvas() {
   setTimeout(function() {
     canvas.width = videoElement.videoWidth;
     canvas.height = videoElement.videoHeight;
-    img.height = videoElement.videoHeight;
-    img.width = videoElement.videoWidth;
+    img.height = videoElement.offsetHeight;
+    img.width = videoElement.offsetWidth;
   }, 100);
 }
 
@@ -105,7 +142,9 @@ function snapshot() {
 
 screenshot_button.addEventListener('click', function(e) {
   if (localMediaStream) {
+    $('#puzzleres').hide();
     snapshot();
+
     return;
   }
 }, false);
@@ -119,7 +158,8 @@ function gotSources(sourceInfos) {
     var option = document.createElement("option");
     option.value = sourceInfo.id;
     if (sourceInfo.kind === 'audio') {
-    } else if (sourceInfo.kind === 'video') {
+    }
+    else if (sourceInfo.kind === 'video') {
       option.text = sourceInfo.label || 'camera ' + (videoSelect.length + 1);
       videoSelect.appendChild(option);
     } else {
@@ -129,7 +169,7 @@ function gotSources(sourceInfos) {
 }
 
 if (typeof MediaStreamTrack === 'undefined'){
-  alert('This browser does not support MediaStreamTrack.\n\nTry Chrome Canary.');
+  alert('This browser does not support MediaStreamTrack.');
 } else {
   MediaStreamTrack.getSources(gotSources);
 }

@@ -18,8 +18,6 @@ Code modified from the following sources:
 - http://goo.gl/U4hMDV, using http://norvig.com/sudoku.py
 """
 
-__author__ = 'kbrisbin@google.com (Kathryn Hurley)'
-
 import logging
 
 import norvig_sudoku

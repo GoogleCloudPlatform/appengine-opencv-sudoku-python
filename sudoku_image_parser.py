@@ -19,8 +19,6 @@ Code modified from the following sources:
 - http://goo.gl/8O3obH
 """
 
-__author__ = 'kbrisbin@google.com (Kathryn Hurley)'
-
 import cv
 import cv2
 import numpy as np

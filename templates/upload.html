@@ -1,6 +1,7 @@
 {% extends "templates/base.html" %}
 {% block content %}
 
+
   <!-- Static navbar -->
   <div class="navbar navbar-default" role="navigation">
     <div class="container-fluid">
@@ -17,7 +18,6 @@
         <ul class="nav navbar-nav">
           <li ><a href="/">Capture and Solve</a></li>
           <li class="active"><a href="#">Upload and Solve</a></li>
-          <!-- <li><a href="#">Link</a></li> -->
         </ul>
       </div><!--/.nav-collapse -->
     </div><!--/.container-fluid -->
@@ -28,7 +28,7 @@
 
     <div class="abox">
       <form role="form" id="form1" runat="server"
-        action="/solve_upld" enctype="multipart/form-data" method="post">
+        action="/stage" enctype="multipart/form-data" method="post">
         <div class="form-group">
           <label for="sudokufn">File input</label>
           <input type="file" id ="sudokufn" name="sudoku">
@@ -36,10 +36,19 @@
         </div>
         <input type="hidden" name="sudoku_url" id="sudoku_url"
           value="http://storage.googleapis.com/vm-sudoku/unsolved_puzzles/sudoku-book-02.png">
-        <input type="submit" class="btn btn-primary" value="Solve"><br/>
-        <img height="400" id="puzzle" src="http://storage.googleapis.com/vm-sudoku/unsolved_puzzles/sudoku-book-02.png"
+        <input type="submit" class="btn btn-primary" value="Solve" on="submitImage();"><br/>
+       </form><br/>
+
+       <div class="row">
+         <div class="col-md-5">
+          <img style="width:95%;" id="puzzle"
+            src="http://storage.googleapis.com/vm-sudoku/unsolved_puzzles/sudoku-book-02.png"
           alt="Sudoku image" />
-       </form>
+         </div>
+         <div class="col-md-5">
+           <img style="display:none;width:95%;" id="puzzleres" src="" alt="solved Sudoku image" />
+         </div>
+       </div>
 
   </div>
 
@@ -48,23 +57,57 @@
 <script>
 
 
-    function readURL(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
+ $("#form1").submit(function(){
+    var formData = new FormData($(this)[0]);
 
-            reader.onload = function (e) {
-                $('#puzzle').attr('src', e.target.result);
-                $('#puzzle').show();            }
-
-            reader.readAsDataURL(input.files[0]);
+    $.ajax({
+    url:$(this).attr("action"),
+    type: 'POST',
+    data: formData,
+    async: false,
+    success: function (data) {
+      console.log(data);
+      var solved_url = data.solved_url;
+      if (solved_url) {
+      // check for results to show up
+      setTimeout(function show_results() {
+        console.log("in setTimeout, checking " + solved_url);
+        var img = new Image();
+        img.onload = function() {
+          $('#puzzleres').attr('src', solved_url);
+          $('#puzzleres').show();
+        };
+        img.onerror = function() {
+          setTimeout(show_results, 200);
         }
-    }
-
-
-
-    $("#sudokufn").change(function(){
-        readURL(this);
+        img.src = solved_url;
+        }, 200);
+       }
+    },
+    cache: false,
+    contentType: false,
+    processData: false
     });
+    return false;
+});
+
+
+  function readURL(input) {
+      if (input.files && input.files[0]) {
+          var reader = new FileReader();
+
+          reader.onload = function (e) {
+              $('#puzzle').attr('src', e.target.result);
+              $('#puzzle').show();
+              $('#puzzleres').hide();
+          }
+          reader.readAsDataURL(input.files[0]);
+      }
+  }
+
+  $("#sudokufn").change(function(){
+      readURL(this);
+  });
 </script>
 
 {% endblock %}
