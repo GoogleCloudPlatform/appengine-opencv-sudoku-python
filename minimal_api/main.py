@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""VM Runtime sample application using OpenCV."""
+"""Managed VMs sample application using OpenCV."""
 
-__author__ = 'kbrisbin@google.com (Kathryn Hurley)'
 
 import logging
 import os
