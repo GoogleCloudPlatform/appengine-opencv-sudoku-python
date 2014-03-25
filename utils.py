@@ -23,55 +23,55 @@ import cloudstorage as gcs
 import config
 
 def create_fname(suffix):
-  path = '/'
-  filename = path + config.BUCKET_NAME + path + get_uuid() + '.' + suffix
-  # logging.info('Creating GCS filename %s...', filename)
-  return filename
+    path = '/'
+    filename = path + config.BUCKET_NAME + path + get_uuid() + '.' + suffix
+    # logging.info('Creating GCS filename %s...', filename)
+    return filename
 
 def create_jpg_file(filename, image_data):
-  """Create a public GCS object for the given image data in the
-  configured bucket."""
+    """Create a public GCS object for the given image data in the
+    configured bucket."""
 
-  gcs_file = gcs.open(filename,
-                      'w',
-                      content_type='image/jpeg',
-                      # make the image public
-                      options={'x-goog-acl': 'public-read'}
-                      )
-  gcs_file.write(image_data)
-  gcs_file.close()
-  return filename
+    gcs_file = gcs.open(filename,
+                        'w',
+                        content_type='image/jpeg',
+                        # make the image public
+                        options={'x-goog-acl': 'public-read'}
+                        )
+    gcs_file.write(image_data)
+    gcs_file.close()
+    return filename
 
 def create_png_file(image_data):
-  """Create a public GCS object for the given image data in the
-  configured bucket."""
+    """Create a public GCS object for the given image data in the
+    configured bucket."""
 
-  filename = create_fname('png')
+    filename = create_fname('png')
 
-  gcs_file = gcs.open(filename,
-                      'w',
-                      content_type='image/png',
-                      # make the image public
-                      options={'x-goog-acl': 'public-read'}
-                      )
-  gcs_file.write(image_data)
-  gcs_file.close()
-  return filename
+    gcs_file = gcs.open(filename,
+                        'w',
+                        content_type='image/png',
+                        # make the image public
+                        options={'x-goog-acl': 'public-read'}
+                        )
+    gcs_file.write(image_data)
+    gcs_file.close()
+    return filename
 
 def copy_error_image(filename):
-  """Copy an error image to the given GCS-formatted filename.
-  """
-  try:
-      # If we had an error, use an error message image as the response.
-      f = open("templates/sorry.jpg", "rb")
-      image_data = f.read()
-      gcs_file = create_jpg_file(filename, image_data)
-      return gcs_file
-  except:
-      logging.exception("could not copy image file")
-      return None
+    """Copy an error image to the given GCS-formatted filename.
+    """
+    try:
+        # If we had an error, use an error message image as the response.
+        f = open("templates/sorry.jpg", "rb")
+        image_data = f.read()
+        gcs_file = create_jpg_file(filename, image_data)
+        return gcs_file
+    except:
+        logging.exception("could not copy image file")
+        return None
 
 # get a UUID - URL-safe, base64
 def get_uuid():
-  r_uuid = base64.urlsafe_b64encode(uuid.uuid4().bytes)
-  return r_uuid.replace('=', '')
+    r_uuid = base64.urlsafe_b64encode(uuid.uuid4().bytes)
+    return r_uuid.replace('=', '')

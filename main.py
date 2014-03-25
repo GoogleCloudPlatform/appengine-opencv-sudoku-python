@@ -99,35 +99,35 @@ class SolveStage(webapp2.RequestHandler):
             # otherwise, try to get the image from the default URL in the form
             logging.info("did not get image data from form submit")
             image_url = self.request.get('sudoku_url')
-        if image_url:
-            logging.info("using image url: %s", image_url)
-            # create a task to solve the puzzle.  The handler will be routed to a
-            # Managed VM.
-            try:
-                # Create a Task Queue task to parse and solve the puzzle.
-                # As task parameters, indicate the URL containing the image to solve, and
-                # the GCS filename to which to write the solution image.
-                task = taskqueue.Task(url='/solve_async',
-                               method='POST',
-                               params={'image_url': image_url,
-                                       'filename' : filename})
-                # add the task to the default task queue. (Alternately, you could define a separate
-                # dedicated task queue for this purpose).
-                taskqueue.Queue().add(task)
-                # Respond to the client, indicating the URL to which the solution will
-                # be written.
-                resp = {'status': 'OK',
-                        'solved_url' : solved_url}
-                self.response.headers['Content-Type'] = 'application/json'
-                self.response.write(json.dumps(resp))
-
-            except (taskqueue.UnknownQueueError, taskqueue.TransientError):
-                logging.exception("issue adding task to queue")
-                resp = self.generate_error_response(filename, solved_url)
-                self.response.headers['Content-Type'] = 'application/json'
-                self.response.write(resp)
-        else:
+        if not image_url:
             logging.warn("could not generate image url")
+            resp = self.generate_error_response(filename, solved_url)
+            self.response.headers['Content-Type'] = 'application/json'
+            self.response.write(resp)
+            return
+        logging.info("using image url: %s", image_url)
+        # create a task to solve the puzzle.  The handler will be routed to a
+        # Managed VM.
+        try:
+            # Create a Task Queue task to parse and solve the puzzle.
+            # As task parameters, indicate the URL containing the image to solve, and
+            # the GCS filename to which to write the solution image.
+            task = taskqueue.Task(url='/solve_async',
+                           method='POST',
+                           params={'image_url': image_url,
+                                   'filename' : filename})
+            # add the task to the default task queue. (Alternately, you could define a separate
+            # dedicated task queue for this purpose).
+            taskqueue.Queue().add(task)
+            # Respond to the client, indicating the URL to which the solution will
+            # be written.
+            resp = {'status': 'OK',
+                    'solved_url' : solved_url}
+            self.response.headers['Content-Type'] = 'application/json'
+            self.response.write(json.dumps(resp))
+
+        except (taskqueue.UnknownQueueError, taskqueue.TransientError):
+            logging.exception("issue adding task to queue")
             resp = self.generate_error_response(filename, solved_url)
             self.response.headers['Content-Type'] = 'application/json'
             self.response.write(resp)

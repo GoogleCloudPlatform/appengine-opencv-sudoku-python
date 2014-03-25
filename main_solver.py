@@ -71,27 +71,29 @@ class SolveAsync(SolverBase):
                 logging.info('did not get image url...')
         except:
             logging.exception("issue fetching url data")
-        if image_data:
-            self.parser = sudoku_image_parser.SudokuImageParser()
-            stringified_puzzle = ''
-            try:
-                stringified_puzzle = self.parser.parse(image_data)
-                logging.info("stringified puzzle: %s", stringified_puzzle)
-            except (IndexError, sudoku_image_parser.ImageError) as e:
-                logging.debug(e)
-                utils.copy_error_image(filename)
-                return
-            try:
-                image_solution = self._solved_puzzle_image(stringified_puzzle)
-                gcs_file = utils.create_jpg_file(filename, image_solution.tostring())
-                logging.debug("url: %s%s", self.api_url, gcs_file)
-                return
-            except (sudoku_solver.ContradictionError, ValueError) as e:
-                logging.debug(e)
-                utils.copy_error_image(filename)
-                return
-        else:
+        if not image_data:
             logging.info("no image data")
+            utils.copy_error_image(filename)
+            return
+
+        self.parser = sudoku_image_parser.SudokuImageParser()
+        stringified_puzzle = ''
+        try:
+            stringified_puzzle = self.parser.parse(image_data)
+            logging.info("stringified puzzle: %s", stringified_puzzle)
+        except (IndexError, sudoku_image_parser.ImageError) as e:
+            logging.debug(e)
+            utils.copy_error_image(filename)
+            return
+        try:
+            image_solution = self._solved_puzzle_image(stringified_puzzle)
+            gcs_file = utils.create_jpg_file(filename, image_solution.tostring())
+            logging.debug("url: %s%s", self.api_url, gcs_file)
+            return
+        except (sudoku_solver.ContradictionError, ValueError) as e:
+            logging.debug(e)
+            utils.copy_error_image(filename)
+            return
 
 
 APP = webapp2.WSGIApplication([

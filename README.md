@@ -10,7 +10,9 @@ to the app to be solved.  The app then solves the puzzle, using OpenCV to do OCR
 solution superimposed on the original image.
 OpenCV does not run on traditional App Engine instances due to their sandboxing restrictions.
 
-This demo uses two [Modules](https://developers.google.com/appengine/docs/python/modules/),
+Note: Currently, Managed VMs are part of the [Cloud Platform Early Access Program](https://developers.google.com/cloud/early-access), and so you will need to be part of this program, and have your app whitelisted for Managed VMs, to run this demo.
+
+This app uses two [Modules](https://developers.google.com/appengine/docs/python/modules/),
 defined in `app.yaml` (the default module) and `backend.yaml` (the 'solver' module).
 The default module uses "traditional" App Engine instances, and the `solver`
 module specifies Managed VMs.
