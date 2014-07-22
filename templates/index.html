@@ -135,9 +135,18 @@ function sizeCanvas() {
 
 function snapshot() {
   console.log("in snapshot");
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  // make canvas size equal to the video source
+  canvas.width = videoElement.videoWidth;
+  canvas.height = videoElement.videoHeight;
+  // for some reason img height is smaller than the video
+  // but I think it's unrelated problem. this adjustment is
+  // only for a visual aspect as the canvas data URL won't change.
+  img.height = videoElement.offsetHeight;
+  img.width = videoElement.offsetWidth;
   ctx.drawImage(videoElement, 0, 0);
-  img.src = canvas.toDataURL('image/png');
-  sudoku.value = canvas.toDataURL('image/png');
+  img.src = sudoku.value = canvas.toDataURL('image/png');
 }
 
 screenshot_button.addEventListener('click', function(e) {
