@@ -70,7 +70,7 @@ $ <path_to_download>/boot2docker-<version>-linux-<processor> up
 
 ```
 
-Then continue with Docker the installation as described above
+Then continue with the Docker installation as described above
 
 ## Deploying
 
