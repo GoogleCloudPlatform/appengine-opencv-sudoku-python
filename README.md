@@ -54,7 +54,7 @@ Create a billing enabled project and install the Google Cloud SDK as described [
 Then, edit the bucket name in `config.py` to the name of a Google Cloud Storage bucket for which your app has been given write permissions via its service account.  See [Using Service Accounts for Authentication](https://developers.google.com/storage/docs/authentication#service_accounts) for more information.
 
 
-### Installing boot2docker on Linux (Workaround)
+### Installing boot2docker on Linux
 
 First install VirtualBox if you do not already have it:
 
@@ -70,7 +70,7 @@ $ <path_to_download>/boot2docker-<version>-linux-<processor> up
 
 ```
 
-Then continue with Docker installation as described above
+Then continue with Docker the installation as described above
 
 ## Deploying
 
