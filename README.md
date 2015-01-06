@@ -10,9 +10,9 @@ to the app to be solved.  The app then solves the puzzle, using OpenCV to do OCR
 solution superimposed on the original image.
 OpenCV does not run on traditional App Engine instances due to their sandboxing restrictions.
 
-Note: Currently, Managed VMs are part of the [Cloud Platform Early Access Program](https://developers.google.com/cloud/early-access), and so you will need to be part of this program, and have your app whitelisted for Managed VMs, to run this demo.
+Note: Currently, Managed VMs are in Beta and as such may be subject to backward-incompatible changes.
 
-This app uses two [Modules](https://developers.google.com/appengine/docs/python/modules/),
+This app uses two [Modules](https://cloud.google.com/appengine/docs/python/modules/),
 defined in `app.yaml` (the default module) and `backend.yaml` (the 'solver' module).
 The default module uses "traditional" App Engine instances, and the `solver`
 module specifies Managed VMs.
@@ -47,25 +47,37 @@ Code was used and modified from the following sources:
 - [OpenCV's square detector sample][4]
 
 
-## Configuration and Deployment
+## Project Setup
 
-First, edit the bucket name in `config.py` to the name of a Google Cloud Storage bucket for which
-your app has been given write permissions via its service account.  See
-[Using Service Accounts for Authentication](https://developers.google.com/storage/docs/authentication#service_accounts) for more information.
+Create a billing enabled project and install the Google Cloud SDK as described [here](https://cloud.google.com/appengine/docs/python/managed-vms/#install-sdk) (this includes [installing Docker](https://cloud.google.com/appengine/docs/python/managed-vms/#install-docker))
 
-Change the app name in both the `app.yaml` and `backend.yaml` files to the name of your app.
-Do the same in `dispatch.yaml`.
+Then, edit the bucket name in `config.py` to the name of a Google Cloud Storage bucket for which your app has been given write permissions via its service account.  See [Using Service Accounts for Authentication](https://developers.google.com/storage/docs/authentication#service_accounts) for more information.
 
-To deploy, do, the following.  First, update (deploy) the modules as follows:
 
-    <path_to_sdk>/appcfg.py update -s preview.appengine.google.com app.yaml backend.yaml
+### Installing boot2docker on Linux (Workaround)
 
-(You can also deploy them individually if you like).
+First install VirtualBox if you do not already have it:
 
-Then, update the app's module dispatch definitions as follows.  You only need to do this step once,
-unless you change the app's module routing information.
+```
+$ sudo apt-get install VirtualBox
+```
 
-    <path_to_sdk>/appcfg.py update_dispatch -s preview.appengine.google.com  <proj_dir>
+Next download the [latest boot2docker release](https://github.com/boot2docker/boot2docker-cli/releases) and then start the daemon:
+
+```
+$ <path_to_download>/boot2docker-<version>-linux-<processor> init
+$ <path_to_download>/boot2docker-<version>-linux-<processor> up
+
+```
+
+Then continue with Docker installation as described above
+
+## Deploying
+
+After successfully setting up your project, you can either [run locally](https://cloud.google.com/appengine/docs/python/managed-vms/sdk#run-local), or [deploy to production](https://cloud.google.com/appengine/docs/python/managed-vms/sdk#deploy)
+
+
+
 
 [1]: http://opencv.org/
 [2]: http://opencvpython.blogspot.com/
