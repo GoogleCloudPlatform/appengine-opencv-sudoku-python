@@ -65,17 +65,17 @@ $ <path_to_download>/boot2docker-<version>-linux-<processor> up
 
 ```
 
-Then continue with Docker installation as described above
+Then continue with the Docker installation as described above.
 
 ### Enabling Google Cloud Storage
 
-This app saves it's images to Google Cloud Storage. To enable this you must first [create a bucket](https://cloud.google.com/storage/docs/cloud-console#_creatingbuckets) in Google Cloud Storage. Your app will automatically have write permission for this bucket if you create it within the project you created for your app. Otherwise, you must [set up a service account](https://developers.google.com/storage/docs/authentication#service_accounts) for your app, and add that service account to your [bucket's ACL](https://cloud.google.com/storage/docs/cloud-console#_bucketpermission).
+This app saves its images to Google Cloud Storage. To enable this you must first [create a bucket](https://cloud.google.com/storage/docs/cloud-console#_creatingbuckets) in Google Cloud Storage. Your app will automatically have write permission for this bucket if you create it within the project you created for your app. Otherwise, you must [set up a service account](https://developers.google.com/storage/docs/authentication#service_accounts) for your app, and add that service account to your [bucket's ACL](https://cloud.google.com/storage/docs/cloud-console#_bucketpermission).
 
 Finally, edit the bucket name in `config.py` to match the name of the Google Cloud Storage bucket you created.
 
 ## Deploying
 
-After successfully setting up your project, you can either [run locally](https://cloud.google.com/appengine/docs/python/managed-vms/sdk#run-local), or [deploy to production](https://cloud.google.com/appengine/docs/python/managed-vms/sdk#deploy)
+After successfully setting up your project, you can either [run locally](https://cloud.google.com/appengine/docs/python/managed-vms/sdk#run-local), or [deploy to production](https://cloud.google.com/appengine/docs/python/managed-vms/sdk#deploy).
 
 
 
