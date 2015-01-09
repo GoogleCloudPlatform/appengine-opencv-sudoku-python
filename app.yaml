@@ -1,4 +1,3 @@
-application: vm-runtime-tester
 version: opencv
 runtime: python27
 api_version: 1

@@ -1,4 +1,3 @@
-application: vm-runtime-tester
 version: opencv
 module: solver
 runtime: python27
@@ -11,13 +10,3 @@ handlers:
 - url: .*
   script: main_solver.APP
 
-libraries:
-- name: webapp2
-  version: "2.5.2"
-
-manual_scaling:
-  instances: 2
-
-vm_settings:
-  machine_type: n1-standard-1
-  apt_get_install: python-opencv
